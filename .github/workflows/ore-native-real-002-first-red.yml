@@ -1,0 +1,35 @@
+name: ORE Native Real 002 First Red
+
+on:
+  push:
+    branches:
+      - ore-v0.2-native-real-002
+  workflow_dispatch:
+
+jobs:
+  first-red:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      NODE_ENV: test
+      JWT_SECRET: test-secret
+      SKIP_HORIZON_VALIDATION: "true"
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/novasupport_test"
+      DIRECT_URL: "postgresql://postgres:postgres@127.0.0.1:5432/novasupport_test"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend dependencies
+        run: npm ci --legacy-peer-deps
+      - name: Generate Prisma client
+        run: npm run db:generate
+      - name: Run weekly digest First Red
+        run: NODE_ENV=test JWT_SECRET=test-secret node --import tsx --test src/services/weekly-digest.test.ts
