@@ -16,6 +16,8 @@ jobs:
       NODE_ENV: test
       JWT_SECRET: test-secret
       SKIP_HORIZON_VALIDATION: "true"
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/novasupport_test"
+      DIRECT_URL: "postgresql://postgres:postgres@127.0.0.1:5432/novasupport_test"
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
