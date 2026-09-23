@@ -213,3 +213,4 @@ test("issue #1120: unique supporter query excludes failed transactions", async (
     "unique supporter query must exclude failed transactions",
   );
 });
+
