@@ -195,3 +195,21 @@ test("escapeHtml leaves clean strings unchanged", () => {
   assert.equal(escapeHtml("XLM"), "XLM");
   assert.equal(escapeHtml("USDC"), "USDC");
 });
+
+
+test("issue #1120: unique supporter query excludes failed transactions", async () => {
+  const mockPrisma = makePrismaMock({ profiles: [makeProfile()], transactions: [] });
+
+  await sendWeeklyDigests(mockPrisma as any);
+
+  const calls = (mockPrisma.supportTransaction.findMany as any).mock.calls;
+  const uniqueCall = calls.find((call: any) => call.arguments?.[0]?.distinct?.includes("supporterAddress"));
+  assert.ok(uniqueCall, "expected unique supporter query to run");
+
+  const where = uniqueCall.arguments[0].where;
+  assert.deepEqual(
+    where.status,
+    { not: "failed" },
+    "unique supporter query must exclude failed transactions",
+  );
+});
